@@ -15,6 +15,8 @@ import javax.annotation.PostConstruct
 @Service
 class HumsterBotServiceImpl(private val humsterEventListener: HumsterEventListener) : HumsterBotService {
 
+    private var paused = false
+
     lateinit var jda: JDA
 
     override fun getJdi(): JDA = jda
@@ -28,7 +30,6 @@ class HumsterBotServiceImpl(private val humsterEventListener: HumsterEventListen
     //TODO refactor with constructor
     @PostConstruct
     override fun startBot() {
-//        val humsterEventListener = HumsterEventListener(this)
         jda = JDABuilder(token)
                 .addEventListeners(humsterEventListener)
                 .build()
@@ -54,6 +55,14 @@ class HumsterBotServiceImpl(private val humsterEventListener: HumsterEventListen
         val date = dateFormat.parse(returnDateRaw)
         val today = Date()
         return "Я вернусь через " + ChronoUnit.DAYS.between(today.toInstant(), date.toInstant()).toString() + " дней"
+    }
+
+    override fun setPaused(paused: Boolean) {
+        this.paused = paused
+    }
+
+    override fun isPaused(): Boolean {
+        return paused
     }
 }
 

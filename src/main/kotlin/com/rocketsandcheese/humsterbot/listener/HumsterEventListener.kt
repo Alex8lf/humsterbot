@@ -50,6 +50,15 @@ class HumsterEventListener : ListenerAdapter() {
     private fun handlePrivateMessage(event: MessageReceivedEvent) {
         val message = event.message.contentDisplay
         val args = message.split(" ")
+
+        if (humsterBotService.isPaused()) {
+            if (args[0].equals("unpause")) {
+                humsterBotService.setPaused(false)
+            } else {
+                return
+            }
+        }
+
         when (args[0]) {
             "me" -> humsterBotService.broadcastMessage(args[1].toLong(), message.substring(message.indexOf(args[2])))
             "help" -> event.channel.sendMessage(helpMessage).queue()
@@ -61,7 +70,7 @@ class HumsterEventListener : ListenerAdapter() {
             "target" -> when (args[1]) {
                 "add" -> {
                     val savedWord = targetWordRepository.save(TargetWord(0, message.substring(message.indexOf(args[2]))))
-                    event.channel.sendMessage("Target word" + savedWord.value +  "saved").queue()
+                    event.channel.sendMessage("Target word" + savedWord.value + "saved").queue()
                 }
                 "rm" -> {
                     targetWordRepository.deleteById(args[2].toLong())
@@ -70,6 +79,7 @@ class HumsterEventListener : ListenerAdapter() {
                 "list" -> event.channel.sendMessage(targetWordRepository.findAll().toString()).queue()
             }
             "reboot" -> System.exit(0)
+            "pause" -> humsterBotService.setPaused(true)
         }
     }
 
