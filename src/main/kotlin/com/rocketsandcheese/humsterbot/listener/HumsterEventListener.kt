@@ -66,7 +66,7 @@ class HumsterEventListener : ListenerAdapter() {
                 }
                 "rm" -> {
                     targetWordRepository.deleteById(args[2].toLong())
-                    event.channel.sendMessage(phraseService.deletePhrase(args[2].toLong())).queue()
+                    event.channel.sendMessage("Target word successfully removed").queue()
                 }
                 "list" -> event.channel.sendMessage(targetWordRepository.findAll().toString()).queue()
             }
