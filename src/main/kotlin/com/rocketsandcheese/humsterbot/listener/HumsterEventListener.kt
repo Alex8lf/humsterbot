@@ -69,8 +69,8 @@ class HumsterEventListener : ListenerAdapter() {
                     event.channel.sendMessage(phraseService.deletePhrase(args[2].toLong())).queue()
                 }
                 "list" -> event.channel.sendMessage(targetWordRepository.findAll().toString()).queue()
-                "reboot" -> System.exit(0)
             }
+            "reboot" -> System.exit(0)
         }
     }
 
