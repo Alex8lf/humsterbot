@@ -49,7 +49,7 @@ class HumsterEventListener : ListenerAdapter() {
 
     private fun handlePrivateMessage(event: MessageReceivedEvent) {
         val message = event.message.contentDisplay
-        val args = message.toLowerCase().split(" ")
+        val args = message.split(" ")
         when (args[0]) {
             "me" -> humsterBotService.broadcastMessage(args[1].toLong(), message.substring(message.indexOf(args[2])))
             "help" -> event.channel.sendMessage(helpMessage).queue()
