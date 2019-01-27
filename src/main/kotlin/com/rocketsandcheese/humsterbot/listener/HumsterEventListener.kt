@@ -4,7 +4,6 @@ import com.rocketsandcheese.humsterbot.entity.TargetWord
 import com.rocketsandcheese.humsterbot.repository.TargetWordRepository
 import com.rocketsandcheese.humsterbot.service.HumsterBotService
 import com.rocketsandcheese.humsterbot.service.PhraseService
-import com.sun.jna.StringArray
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -49,8 +48,8 @@ class HumsterEventListener : ListenerAdapter() {
     }
 
     private fun handlePrivateMessage(event: MessageReceivedEvent) {
-        val message = event.message.contentDisplay.toLowerCase()
-        val args = message.split(" ")
+        val message = event.message.contentDisplay
+        val args = message.toLowerCase().split(" ")
         when (args[0]) {
             "me" -> humsterBotService.broadcastMessage(args[1].toLong(), message.substring(message.indexOf(args[2])))
             "help" -> event.channel.sendMessage(helpMessage).queue()
@@ -61,8 +60,8 @@ class HumsterEventListener : ListenerAdapter() {
             }
             "target" -> when (args[1]) {
                 "add" -> {
-                    var savedWord = targetWordRepository.save(TargetWord(0, message.substring(message.indexOf(args[2]))))
-                    event.channel.sendMessage("Target word saved").queue()
+                    val savedWord = targetWordRepository.save(TargetWord(0, message.substring(message.indexOf(args[2]))))
+                    event.channel.sendMessage("Target word" + savedWord.value +  "saved").queue()
                 }
                 "rm" -> {
                     targetWordRepository.deleteById(args[2].toLong())
