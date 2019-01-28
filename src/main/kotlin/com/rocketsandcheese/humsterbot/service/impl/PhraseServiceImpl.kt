@@ -1,24 +1,33 @@
 package com.rocketsandcheese.humsterbot.service.impl
 
 import com.rocketsandcheese.humsterbot.entity.Phrase
+import com.rocketsandcheese.humsterbot.repository.CategoryRepository
 import com.rocketsandcheese.humsterbot.repository.PhraseRepository
 import com.rocketsandcheese.humsterbot.service.PhraseService
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Random
 import javax.transaction.Transactional
 
 @Service
-class PhraseServiceImpl(private var phraseRepository: PhraseRepository): PhraseService {
+class PhraseServiceImpl(
+    private val phraseRepository: PhraseRepository,
+    private val categoryRepository: CategoryRepository
+) : PhraseService {
 
-    override fun getPhrases(): String {
-        val phrases = phraseRepository.findAll().toString()
-        return phrases;
+    override fun getPhrases(categoryId: Long): String {
+        val category = categoryRepository.findById(categoryId).get()
+        val phrases = phraseRepository.findByCategoryId(categoryId)
+        val formattedOutput = StringBuilder()
+        formattedOutput.append("Phrases for category \"" + category.value + "\"")
+        phrases.forEach { formattedOutput.append("\n" + it.id + "\t" + it.value) }
+        return formattedOutput.toString()
     }
 
-    override fun addPhrase(phraseValue: String): String {
-        val phrase = Phrase(0, phraseValue)
-        phraseRepository.save(phrase)
-        return "Phrase \"$phraseValue\"successfully created"
+    override fun addPhrase(categoryId: Long, phraseValue: String): String {
+        val category = categoryRepository.getOne(categoryId)
+        var phrase = Phrase(phraseValue, category)
+        phrase = phraseRepository.save(phrase)
+        return "Phrase \"" + phrase.value + "\" in category \"" + phrase.category.value + "\" successfully created"
     }
 
     @Transactional
