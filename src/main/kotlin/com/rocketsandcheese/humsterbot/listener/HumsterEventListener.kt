@@ -4,6 +4,7 @@ import com.rocketsandcheese.humsterbot.repository.TargetWordRepository
 import com.rocketsandcheese.humsterbot.service.CategoryService
 import com.rocketsandcheese.humsterbot.service.HumsterBotService
 import com.rocketsandcheese.humsterbot.service.PhraseService
+import com.rocketsandcheese.humsterbot.service.TargetWordService
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -17,6 +18,9 @@ import javax.transaction.Transactional
 @Component
 class HumsterEventListener : ListenerAdapter() {
 
+    @Value("\${helpMessage}")
+    private lateinit var helpMessage: String
+
     @Autowired
     private lateinit var humsterBotService: HumsterBotService
 
@@ -26,11 +30,11 @@ class HumsterEventListener : ListenerAdapter() {
     @Autowired
     private lateinit var targetWordRepository: TargetWordRepository
 
-    @Value("\${helpMessage}")
-    private lateinit var helpMessage: String
-
     @Autowired
     private lateinit var categoryService: CategoryService
+
+    @Autowired
+    private lateinit var targetWordService: TargetWordService
 
     //todo use positive numbers indexes
     @Transactional //todo move transactional to specific service methods
@@ -86,25 +90,29 @@ class HumsterEventListener : ListenerAdapter() {
                     channel, categoryService.createCategory(messageText.substring(messageText.indexOf(args[2])))
                 )
             }
+
             "phrase" -> when (args[1]) {
-                "add" -> event.channel.sendMessage(
-                    phraseService
-                        .addPhrase(args[2].toLong(), messageText.substring(messageText.indexOf(args[3])))
-                ).queue()
+                "add" -> sendMessage(
+                    channel,
+                    phraseService.addPhrase(args[2].toLong(), messageText.substring(messageText.indexOf(args[3])))
+                )
                 "rm" -> event.channel.sendMessage(phraseService.deletePhrase(args[4].toLong())).queue()
                 "list" -> event.channel.sendMessage(phraseService.getPhrases(args[2].toLong())).queue()
             }
+
             "target" -> when (args[1]) {
                 "add" -> {
-                    //TODO
-                    //                    val savedWord = targetWordRepository.save(TargetWord(0, message.substring(message.indexOf(args[2]))))
-                    //                    event.channel.sendMessage("Target word" + savedWord.value + "saved").queue()
+                    sendMessage(
+                        channel, targetWordService.createWord(
+                            args[2].toLong(), messageText.substring(messageText.indexOf(args[3]))
+                        )
+                    )
                 }
                 "rm" -> {
                     targetWordRepository.deleteById(args[2].toLong())
                     event.channel.sendMessage("Target word successfully removed").queue()
                 }
-                "list" -> event.channel.sendMessage(targetWordRepository.findAll().toString()).queue()
+                "list" -> sendMessage(channel, targetWordService.getWords(args[2].toLong()))
             }
 
             "reboot" -> System.exit(0)
