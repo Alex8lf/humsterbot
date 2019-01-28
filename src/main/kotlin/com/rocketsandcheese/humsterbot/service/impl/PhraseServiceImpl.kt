@@ -3,6 +3,7 @@ package com.rocketsandcheese.humsterbot.service.impl
 import com.rocketsandcheese.humsterbot.entity.Phrase
 import com.rocketsandcheese.humsterbot.repository.CategoryRepository
 import com.rocketsandcheese.humsterbot.repository.PhraseRepository
+import com.rocketsandcheese.humsterbot.repository.TargetWordRepository
 import com.rocketsandcheese.humsterbot.service.PhraseService
 import org.springframework.stereotype.Service
 import java.util.Random
@@ -11,7 +12,8 @@ import javax.transaction.Transactional
 @Service
 class PhraseServiceImpl(
     private val phraseRepository: PhraseRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val targetWordRepository: TargetWordRepository
 ) : PhraseService {
 
     override fun getPhrases(categoryId: Long): String {
@@ -36,9 +38,11 @@ class PhraseServiceImpl(
         return ("Phrase successfully removed")
     }
 
-    override fun getRandomPhrase(): String {
-        //TODO refactor to get random phrase directly from db
-        val phrases = phraseRepository.findAll()
+    override fun getReaction(messageText: String): String {
+        val targetWords = targetWordRepository.findAll()
+        val category =
+            targetWords.stream().filter { word -> messageText.contains(word.value) }.findFirst().get().category
+        val phrases = phraseRepository.findByCategoryId(category.id!!)
         val randomIndex = Random().nextInt(phrases.size)
         return phrases[randomIndex].value
     }

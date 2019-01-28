@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.util.stream.Collectors
 import javax.transaction.Transactional
 
 @Component
@@ -41,27 +40,20 @@ class HumsterEventListener : ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.author.isBot) return
         val message = event.message
-        val messageValue = message.contentDisplay.toLowerCase()
+        val messageText = message.contentDisplay.toLowerCase()
 
         if (event.isFromType(ChannelType.PRIVATE)) {
             handlePrivateMessage(event)
-        } else if (containsTargetWords(messageValue)) {
-            if (humsterBotService.isPaused()) return
-            sendMessage(event.channel, phraseService.getRandomPhrase())
         } else if (message?.mentionedUsers != null && message.mentionedUsers.contains(event.jda.selfUser)) {
             if (humsterBotService.isPaused()) return
             handleSelfMention(event)
+        } else {
+            if (humsterBotService.isPaused()) return
+            sendMessage(event.channel, phraseService.getReaction(messageText))
         }
     }
 
     private fun sendMessage(channel: MessageChannel, message: String) = channel.sendMessage(message).queue()
-
-    private fun containsTargetWords(message: String): Boolean {
-        val hatedWords =
-            targetWordRepository.findAll().stream().map { targetWord -> targetWord.value }.collect(Collectors.toList())
-        hatedWords.forEach { word -> if (message.contains(word)) return true }
-        return false
-    }
 
     private fun handlePrivateMessage(event: MessageReceivedEvent) {
         val channel = event.channel

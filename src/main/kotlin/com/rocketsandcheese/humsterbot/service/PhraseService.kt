@@ -4,5 +4,5 @@ interface PhraseService {
     fun getPhrases(categoryId: Long): String
     fun addPhrase(categoryId: Long, phraseValue: String): String
     fun deletePhrase(phraseId: Long): String
-    fun getRandomPhrase(): String
+    fun getReaction(messageText: String): String
 }
