@@ -57,7 +57,7 @@ class HumsterEventListener : ListenerAdapter() {
 
     private fun handlePrivateMessage(event: MessageReceivedEvent) {
         val channel = event.channel
-        val messageText = event.message.contentDisplay
+        val messageText = event.message.contentRaw
         val args = messageText.split(" ")
         args.forEach { it.toLowerCase() }
 
