@@ -88,7 +88,7 @@ class HumsterEventListener : ListenerAdapter() {
                     channel,
                     phraseService.addPhrase(args[2].toLong(), messageText.substring(messageText.indexOf(args[3])))
                 )
-                "rm" -> event.channel.sendMessage(phraseService.deletePhrase(args[4].toLong())).queue()
+                "rm" -> event.channel.sendMessage(phraseService.deletePhrase(args[2].toLong())).queue()
                 "list" -> event.channel.sendMessage(phraseService.getPhrases(args[2].toLong())).queue()
             }
 
