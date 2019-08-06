@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Date
 import javax.annotation.PostConstruct
 
 @Service
@@ -31,8 +31,8 @@ class HumsterBotServiceImpl(private val humsterEventListener: HumsterEventListen
     @PostConstruct
     override fun startBot() {
         jda = JDABuilder(token)
-                .addEventListeners(humsterEventListener)
-                .build()
+            .addEventListeners(humsterEventListener)
+            .build()
     }
 
     override fun addListeners(vararg listener: EventListener) {
@@ -40,14 +40,11 @@ class HumsterBotServiceImpl(private val humsterEventListener: HumsterEventListen
     }
 
     override fun sendMessage(guild: Long, channel: Long, message: String) {
-        jda.getGuildById(guild)
-                .getTextChannelById(channel)
-                .sendMessage(message)
-                .queue()
+        jda.getGuildById(guild)?.getTextChannelById(channel)?.sendMessage(message)?.queue()
     }
 
     override fun broadcastMessage(channelId: Long, message: String) {
-        jda.getTextChannelById(channelId).sendMessage(message).queue()
+        jda.getTextChannelById(channelId)?.sendMessage(message)?.queue()
     }
 
     override fun getReturnDate(): String {

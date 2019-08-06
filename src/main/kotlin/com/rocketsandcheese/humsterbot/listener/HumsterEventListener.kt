@@ -69,6 +69,8 @@ class HumsterEventListener : ListenerAdapter() {
             }
         }
 
+        event.author.asMention
+
         when (args[0]) {
             "me" -> humsterBotService.broadcastMessage(
                 args[1].toLong(), messageText.substring(messageText.indexOf(args[2]))
@@ -88,6 +90,7 @@ class HumsterEventListener : ListenerAdapter() {
                     channel,
                     phraseService.addPhrase(args[2].toLong(), messageText.substring(messageText.indexOf(args[3])))
                 )
+                //todo use listener
                 "rm" -> event.channel.sendMessage(phraseService.deletePhrase(args[2].toLong())).queue()
                 "list" -> event.channel.sendMessage(phraseService.getPhrases(args[2].toLong())).queue()
             }

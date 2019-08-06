@@ -1,13 +1,25 @@
-db:
-  container_name: postgresdb
-  image: postgres:latest
-  volumes:
-    - ./postgres-data:/var/lib/postgresql/data
-  environment:
-    - POSTGRES_PASSWORD=ihatejava
-    - POSTGRES_USER=humster
-    - POSTGRES_DB=humsterbot
-    - PGDATA=/var/lib/postgresql/data/pgdata
-  ports:
-    - 5432:5432
-  restart: unless-stopped
+version: "3.7"
+services:
+  db:
+    container_name: postgresdb
+    image: postgres:latest
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=ihatejava
+      - POSTGRES_USER=humster
+      - POSTGRES_DB=humsterbot
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    restart: always
+
+  humsterbot:
+    container_name: humsterbot
+    image: humsterbot:0.1
+    environment:
+      - "token="
+    depends_on:
+      - db
+    restart: always
+    network_mode: "host"
